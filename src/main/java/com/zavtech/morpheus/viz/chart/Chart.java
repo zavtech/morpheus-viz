@@ -153,9 +153,9 @@ public interface Chart<X extends Comparable> {
      * @param consumer  the consumer to configure aspects of the chart
      * @return          the newly created chart
      */
-    static <X extends Comparable,S extends Comparable> Chart of(DataFrame<?,S> frame, S domainKey, Class<X> domainType, Consumer<Chart<?>> consumer) {
+    static <X extends Comparable,S extends Comparable> Chart<X> of(DataFrame<?,S> frame, S domainKey, Class<X> domainType, Consumer<Chart<X>> consumer) {
         final ChartEngine engine = ChartEngine.getDefaultEngine();
-        final Function<Chart,Chart> function = chart -> { consumer.accept(chart); return chart; };
+        final Function<Chart<X>,Chart<X>> function = chart -> { consumer.accept(chart); return chart; };
         return function.apply(engine.create(frame, domainType, domainKey));
     }
 
@@ -217,7 +217,7 @@ public interface Chart<X extends Comparable> {
      * @param <C>           the column key type for frame
      * @return              the newly created chart
      */
-    static <R extends Comparable,C extends Comparable> Chart hist(DataFrame<R,C> data, C columnKey, int binCount, Consumer<Chart<?>> consumer) {
+    static <R extends Comparable,C extends Comparable> Chart<R> hist(DataFrame<R,C> data, C columnKey, int binCount, Consumer<Chart<?>> consumer) {
         return Chart.hist(data.cols().select(columnKey), binCount, consumer);
     }
 
