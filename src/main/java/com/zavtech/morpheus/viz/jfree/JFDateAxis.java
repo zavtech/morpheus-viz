@@ -99,6 +99,7 @@ class JFDateAxis extends DateAxis {
             }
             return ticksRotated;
         } catch (Exception ex) {
+            //todo: not sure about this
             ex.printStackTrace();
             return ticks;
         }

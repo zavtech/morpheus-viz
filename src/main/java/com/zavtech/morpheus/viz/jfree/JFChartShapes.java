@@ -31,14 +31,14 @@ import com.zavtech.morpheus.viz.chart.ChartShape;
  *
  * <p><strong>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></strong></p>
  */
-public class JFChartShapes {
+class JFChartShapes {
 
     private Map<ChartShape,Shape> shapeMap = new HashMap<>();
 
     /**
      * Constructor
      */
-    public JFChartShapes() {
+    JFChartShapes() {
         this(6d);
     }
 
@@ -46,7 +46,7 @@ public class JFChartShapes {
      * Constructor
      * @param size  the size for shapes
      */
-    public JFChartShapes(double size) {
+    private JFChartShapes(double size) {
         final double delta = size / 2.0;
         shapeMap.put(ChartShape.SQUARE, new Rectangle2D.Double(-delta, -delta, size, size));
         shapeMap.put(ChartShape.CIRCLE, new Ellipse2D.Double(-delta, -delta, size, size));
@@ -62,7 +62,7 @@ public class JFChartShapes {
      * @param shape the chart shape identifier
      * @return      the AWT shape object, if one exists, otherwise null
      */
-    public Shape getShape(ChartShape shape) {
+    Shape getShape(ChartShape shape) {
         return shapeMap.get(shape);
     }
 

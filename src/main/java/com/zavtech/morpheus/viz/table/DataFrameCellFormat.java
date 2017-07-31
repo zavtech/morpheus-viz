@@ -260,7 +260,7 @@ public class DataFrameCellFormat {
      * A routine to ofInts a sequence of decimal formats for various precisions
      * @param template      the pattern template
      * @param count         the number for formatters to ofInts each of increasing precision
-     * @param multiplier    the multiplier to apply to format
+     * @param multiplier    the multiplier to accept to format
      * @param formats       the list of formats to populate
      */
     private static void createDecimalFormats(String template, int count, int multiplier, List<Format> formats) {

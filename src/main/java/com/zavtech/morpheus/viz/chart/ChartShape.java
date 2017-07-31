@@ -15,6 +15,9 @@
  */
 package com.zavtech.morpheus.viz.chart;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * An enum that defines various shapes that can be used to represent points on a chart
  *
@@ -30,6 +33,55 @@ public enum ChartShape {
     TRIANGLE_UP,
     TRIANGLE_DOWN,
     TRIANGLE_RIGHT,
-    TRIANGLE_LEFT
+    TRIANGLE_LEFT;
+
+
+    /**
+     * An interface to an entity that provides shapes for different keys
+     */
+    public interface Provider {
+
+        /**
+         * Returns a shape for the key specified
+         * @param key   the arbitrary key
+         * @return      the shape
+         */
+        ChartShape getShape(Object key);
+    }
+
+
+    /**
+     * The default shape provider
+     */
+    public static class DefaultProvider implements Provider {
+
+        private volatile int index = -1;
+        private ChartShape[] shapes = ChartShape.values();
+        private Map<Object,ChartShape> shapeMap = new HashMap<>();
+
+        @Override
+        public ChartShape getShape(Object key) {
+            ChartShape shape = shapeMap.get(key);
+            if (shape == null) {
+                shape = next();
+                shapeMap.put(key, shape);
+            }
+            return shape;
+        }
+
+        /**
+         * Returns the next shape in line
+         * @return  the next shape
+         */
+        private ChartShape next() {
+            this.index++;
+            if (index < shapes.length) {
+                return shapes[index];
+            } else {
+                this.index = 0;
+                return shapes[index];
+            }
+        }
+    }
 
 }
