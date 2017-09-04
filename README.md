@@ -1,4 +1,4 @@
-## Morpheus Visualization API
+## Morpheus Charting API
 
 The Morpheus visualization library defines a **simple chart abstraction API** with adapters supporting both 
 [JFreeChart](http://www.jfree.org/jfreechart/) as well as [Google Charts](https://developers.google.com/chart/) (with others
@@ -87,7 +87,7 @@ Chart.create().withLinePlot(frame, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-basic-1.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-basic-1.png"/>
 </p>
 
 ### Multiple Series
@@ -134,7 +134,7 @@ Chart.create().withLinePlot(frame, "DataDate", chart -> {
 });
 ```
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-basic-2.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-basic-2.png"/>
 </p>
 
 ### Series Specific Style
@@ -187,7 +187,7 @@ Chart.create().withLinePlot(frame, "DataDate", chart -> {
 });
 ```
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-basic-3.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-basic-3.png"/>
 </p>
 
 ### Multiple Axis
@@ -227,7 +227,7 @@ Chart.create().withLinePlot(frame.cols().select("A", "B"), chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-basic-4.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-basic-4.png"/>
 </p>
 
 ### Multiple Renderers
@@ -267,7 +267,7 @@ Chart.create().withLinePlot(frame.cols().select("A", "B"), chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-basic-5.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-basic-5.png"/>
 </p>
 
 ## Simple Bar Charts
@@ -299,7 +299,7 @@ Chart.create().withBarPlot(data, false, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-bars-1.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-bars-1.png"/>
 </p>
 
 Switching to a horizontal orientation can be done by simply calling the `orient().horizontal()` method as shown below.
@@ -317,7 +317,7 @@ Chart.create().withBarPlot(data, false, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-bars-2.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-bars-2.png"/>
 </p>
 
 ### Continuous Domain Axis
@@ -374,7 +374,7 @@ Chart.create().withBarPlot(frame, false, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-bars-3.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-bars-3.png"/>
 </p>
 
 Thankfully this can be achieved very easily through the API, namely via two methods on the `ChartModel` interface
@@ -397,7 +397,7 @@ Chart.create().withBarPlot(frame, false, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-bars-4.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-bars-4.png"/>
 </p>
 
 The flexibility of the `withLowerDomainInterval()` and `withUpperDomainInterval()` methods means lambdas with any
@@ -450,7 +450,7 @@ Chart.create().withBarPlot(frame, true, chart -> {
 });
 ```
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-stacked-bars-1.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-stacked-bars-1.png"/>
 </p>
 
 Switching to a horizontal orientation can be done by simply calling the `orient().horizontal()` method as shown below.
@@ -468,7 +468,7 @@ Chart.create().withBarPlot(frame, true, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-stacked-bars-2.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-stacked-bars-2.png"/>
 </p>
 
 ### Continuous Domain Axis
@@ -501,7 +501,7 @@ Chart.create().withBarPlot(frame, true, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-stacked-bars-3.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-stacked-bars-3.png"/>
 </p>
 
 **Compatibility Note**: The Google Chart adapter **does not** support lower / upper domain interval functions as the underlying library
@@ -534,7 +534,7 @@ Chart.create().withHistPlot(frame, 50, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-hist-1.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-hist-1.png"/>
 </p>
 
 ### Multiple Distributions
@@ -563,13 +563,13 @@ Chart.create().withHistPlot(frame, 100, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-hist-2.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-hist-2.png"/>
 </p>
 
 ### Fitted Distribution
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-hist-3.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-hist-3.png"/>
 </p>
 
 ## Scatter Charts
@@ -638,7 +638,7 @@ Chart.create().withScatterPlot(frame, false, "X", chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-scatter-1.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-scatter-1.png"/>
 </p>
 
 ## Multiple Series
@@ -671,7 +671,7 @@ Chart.create().withScatterPlot(frame, false, "X", chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-scatter-2.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-scatter-2.png"/>
 </p>
 
 ## Multiple Frames
@@ -710,14 +710,14 @@ Chart.create().withScatterPlot(frame1, false, "X", chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-scatter-3.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-scatter-3.png"/>
 </p>
 
 ## Regression Charts
 
 ### Single Frame
 
-The Morpheus charting API supports fitting a linear trendline to a dataset based on an [Ordinary Least Squares](http://www.zavtech.com/morpheus/regression/ols)
+The Morpheus charting API supports fitting a linear trendline to a dataset based on an [Ordinary Least Squares](http://www.zavtech.com/morpheus/docs/regression/ols)
 regression model. Both the JFreeChart and Google adapters expose the model equation as a tooltip when hovering over
 any of the data points that make up the trendline. By default, the trend line is rendered in black with a thicker
 line stroke, however this can easily be adjusted using the standard series `style()` controller.
@@ -739,7 +739,7 @@ Chart.create().withScatterPlot(frame, false, "X", chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-regress-1.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-regress-1.png"/>
 </p>
 
 ### Multiple Frames
@@ -777,7 +777,7 @@ Chart.create().withScatterPlot(frame1, false, "X", chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-regress-2.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-regress-2.png"/>
 </p>
 
 ## Area Charts
@@ -807,7 +807,7 @@ Chart.create().withAreaPlot(frame, true, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-area-1.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-area-1.png"/>
 </p>
 
 The following code plots the identical dataset but with overlapping areas rather than stacked (which is simply achieved by
@@ -835,7 +835,7 @@ Chart.create().withAreaPlot(frame, false, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-area-2.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-area-2.png"/>
 </p>
 
 
@@ -887,7 +887,7 @@ Chart.create().withPiePlot(frame, false, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-pie-1.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-pie-1.png"/>
 </p>
 
 ### Donut Pie Plot
@@ -908,7 +908,7 @@ Chart.create().withPiePlot(frame, false, "Random", chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-pie-2.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-pie-2.png"/>
 </p>
 
 ### 3D Pie Plot
@@ -926,7 +926,7 @@ Chart.create().withPiePlot(frame, true, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-pie-3.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-pie-3.png"/>
 </p>
 
 ### Exploded Section
@@ -948,11 +948,11 @@ Chart.create().withPiePlot(frame, false, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/images/charts/chart-pie-4.png"/>
+    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/charts/chart-pie-4.png"/>
 </p>
 
 ----
 
 <p align="center">
-    <img style="background: none; border: none;" src="http://www.zavtech.com/morpheus/images/morpheus-logo1.png"/>
+    <img style="background: none; border: none;" src="http://www.zavtech.com/morpheus/docs/images/morpheus-logo1.png"/>
 </p>
