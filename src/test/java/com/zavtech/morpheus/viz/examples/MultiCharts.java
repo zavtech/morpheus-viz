@@ -484,6 +484,20 @@ public class MultiCharts {
 
 
     @Test()
+    public void smallImages() throws Exception {
+        Chart.create().swingMode();
+        List<Chart<?>> charts = createCharts();
+        AtomicInteger counter = new AtomicInteger();
+        charts.forEach(chart -> {
+            chart.legend().bottom();
+            chart.options().withPreferredSize(400, 280);
+            chart.writerPng(new File(String.format("../morpheus-docs/docs/images/gallery/chart-%s.png", counter.incrementAndGet())), 400, 280, true);
+        });
+    }
+
+
+
+    @Test()
     public void swingCharts2() throws Exception {
         Chart.create().swingMode();
         List<Chart<?>> charts = createCharts();
