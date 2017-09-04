@@ -22,155 +22,141 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.util.Date;
+import java.util.Optional;
 import javax.swing.JFrame;
 
-import com.zavtech.morpheus.util.Bounds;
-import com.zavtech.morpheus.viz.chart.Chart;
-import com.zavtech.morpheus.viz.chart.ChartAxes;
-import com.zavtech.morpheus.viz.chart.ChartAxis;
-import com.zavtech.morpheus.viz.chart.ChartBase;
-import com.zavtech.morpheus.viz.chart.ChartException;
-import com.zavtech.morpheus.viz.chart.ChartFormat;
-import com.zavtech.morpheus.viz.chart.ChartLabel;
-import com.zavtech.morpheus.viz.chart.ChartLegend;
-import com.zavtech.morpheus.viz.chart.ChartOrientation;
-import com.zavtech.morpheus.viz.chart.ChartTextStyle;
-import com.zavtech.morpheus.viz.util.ColorModel;
-
+import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.Axis;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.LogAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.Plot;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.title.LegendTitle;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.chart.title.Title;
-import org.jfree.data.Range;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
 
+import com.zavtech.morpheus.viz.chart.Chart;
+import com.zavtech.morpheus.viz.chart.ChartException;
+import com.zavtech.morpheus.viz.chart.ChartLabel;
+import com.zavtech.morpheus.viz.chart.ChartLegend;
+import com.zavtech.morpheus.viz.chart.ChartOptions;
+import com.zavtech.morpheus.viz.chart.ChartTheme;
+
 /**
  * A convenience base class for building various types of chart types
- * @param <T>   the plot type
+ *
+ * @param <P>   the plot type
  *
  * @author Xavier Witdouck
  *
  * <p><strong>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></strong></p>
  */
-abstract class JFChartBase<T extends Plot,X extends Comparable> extends ChartBase<X> {
+abstract class JFChartBase<P> implements Chart<P>, ChartMouseListener {
 
-    private T plot;
+    private P plot;
     private JFreeChart freeChart;
     private ChartPanel chartPanel;
-    private ColorModel colorModel;
+    private ChartOptions options;
+
 
     /**
      * Constructor
      * @param plot      the plot for this chart
      * @param legend    true to enable legend
      */
-    JFChartBase(T plot, boolean legend) {
+    JFChartBase(P plot, boolean legend) {
         this.plot = plot;
-        this.colorModel = new ColorModel.CIEModel();
-        this.freeChart = new JFreeChart(null, new Font("Arial", Font.PLAIN, 4), plot, legend);
+        this.freeChart = new JFreeChart(null, new Font("Arial", Font.PLAIN, 4), underlying(plot), legend);
         this.freeChart.setBackgroundPaint(Color.WHITE);
         this.chartPanel = new ChartPanel(freeChart);
         this.chartPanel.setMouseZoomable(true);
         this.chartPanel.setRefreshBuffer(true);
+        this.chartPanel.addChartMouseListener(this);
+        this.options = new ChartOptions.Default();
     }
+
+
+    /**
+     * Returns the JFreeChart plot object from the Morpheus Plot adapter
+     * @param plot      the Morpheus plot adapter
+     * @return          the JFreeChart plot
+     */
+    private Plot underlying(P plot) {
+        if (plot instanceof JFXyPlot) {
+            return ((JFXyPlot)plot).underlying();
+        } else if (plot instanceof JFCatPlot) {
+            return ((JFCatPlot) plot).underlying();
+        } else if (plot instanceof JFPiePlot) {
+            return ((JFPiePlot) plot).underlying();
+        } else {
+            throw new IllegalArgumentException("Unsupported plot type: " + plot);
+        }
+    }
+
+
+    /**
+     * Returns a reference to the chart panel
+     * @return  the JFreeChart chart panel
+     */
+    ChartPanel chartPanel() {
+        return chartPanel;
+    }
+
+
+    /**
+     * Returns the JFreeChart reference for this chart
+     * @return  the JFreeChart reference
+     */
+    JFreeChart freeChart() {
+        return freeChart;
+    }
+
+
+    @Override
+    public P plot() {
+        return plot;
+    }
+
 
     @Override
     public ChartLabel title() {
         return new TitleAdapter(freeChart, false);
     }
 
+
     @Override
     public ChartLabel subtitle() {
         return new TitleAdapter(freeChart, true);
     }
 
-    @Override
-    public ChartAxes axes() {
-        return new AxesAdapter(freeChart.getPlot());
-    }
 
     @Override
     public ChartLegend legend() {
         return new LegendAdapter(freeChart);
     }
 
-    @Override
-    public ChartOrientation orientation() {
-        return new OrientationAdapter(freeChart.getPlot());
-    }
 
     @Override
-    public Chart withColorModel(ColorModel colorModel) {
-        this.colorModel = colorModel;
-        return this;
+    public ChartOptions options() {
+        return options;
     }
 
-    /**
-     * Returns the plot for this chart
-     * @return  the plot for chart
-     */
-    public T getPlot() {
-        return plot;
+
+    @Override()
+    public ChartTheme theme() {
+        return new ThemeAdapter();
     }
 
-    /**
-     * Returns a reference to the chart panel
-     * @return  the JFreeChart chart panel
-     */
-    public ChartPanel getChartPanel() {
-        return chartPanel;
-    }
 
-    /**
-     * Returns the JFreeChart reference for this chart
-     * @return  the JFreeChart reference
-     */
-    public JFreeChart getFreeChart() {
-        return freeChart;
-    }
-
-    /**
-     * Returns a reference to the color model for this chart
-     * @return      the color model for chart
-     */
-    public ColorModel getColorModel() {
-        return colorModel;
-    }
-
-    /**
-     * Creates a JFrame containing this Chart and sets it visible
-     * @return          the JFrame
-     */
+    @Override
     public Chart show() {
         return show(1024, 600);
     }
 
-    /**
-     * Creates a JFrame containing this Chart and sets it visible
-     * @param width     the frame width
-     * @param height    the frame height
-     * @return          the JFrame
-     */
+
+    @Override
     public Chart show(int width, int height) {
         final JFrame frame = new JFrame();
         frame.getContentPane().setLayout(new BorderLayout(0, 0));
@@ -183,8 +169,9 @@ abstract class JFChartBase<T extends Plot,X extends Comparable> extends ChartBas
         return this;
     }
 
+
     @Override
-    public Chart writerPng(File file, int width, int height) {
+    public Chart writerPng(File file, int width, int height, boolean transparent) {
         BufferedOutputStream os = null;
         try {
             File parent = file.getParentFile();
@@ -194,7 +181,7 @@ abstract class JFChartBase<T extends Plot,X extends Comparable> extends ChartBas
                 }
             }
             os = new BufferedOutputStream(new FileOutputStream(file));
-            writerPng(os, width, height);
+            writerPng(os, width, height, transparent);
             return this;
         } catch (Exception ex) {
             throw new ChartException(ex.getMessage(), ex);
@@ -202,7 +189,7 @@ abstract class JFChartBase<T extends Plot,X extends Comparable> extends ChartBas
             try {
                 if (os != null) {
                     os.flush();
-                    os.close();;
+                    os.close();
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -210,110 +197,33 @@ abstract class JFChartBase<T extends Plot,X extends Comparable> extends ChartBas
         }
     }
 
+
     @Override
-    public Chart writerPng(OutputStream os, int width, int height) {
+    public Chart writerPng(OutputStream os, int width, int height, boolean transparent) {
         try {
-            ChartUtilities.writeChartAsPNG(os, freeChart, width, height);
+            if (transparent) {
+                freeChart().setBackgroundPaint(new Color(255, 255, 255, 0));
+                freeChart().setBackgroundImageAlpha(0.0f);
+                freeChart().getPlot().setBackgroundPaint( new Color(255, 255, 255, 0) );
+                freeChart().getPlot().setBackgroundImageAlpha(0f);
+            }
+            ChartUtilities.writeChartAsPNG(os, freeChart, width, height, transparent, 0);
             return this;
         } catch (Exception ex) {
             throw new ChartException(ex.getMessage(), ex);
-        }
-    }
-
-    /**
-     * A JFreeChart adapter for the ChartAxes interface
-     */
-    private class AxesAdapter implements ChartAxes {
-
-        private Plot plot;
-
-        /**
-         * Constructor
-         * @param plot  the plot reference
-         */
-        private AxesAdapter(Plot plot) {
-            this.plot = plot;
-        }
-
-        @Override
-        public ChartAxis domain() {
-            if (plot instanceof XYPlot) {
-                final XYPlot xyPlot = (XYPlot)plot;
-                return new AxisAdapter(xyPlot.getDomainAxis(), 0, true);
-            } else if (plot instanceof CategoryPlot) {
-                final CategoryPlot categoryPlot = (CategoryPlot)getPlot();
-                return new AxisAdapter(categoryPlot.getDomainAxis(), 0, true);
-            } else {
-                throw new RuntimeException("Unsupported plot type: " + plot.getPlotType());
-            }
-        }
-
-        @Override
-        public ChartAxis range(int index) {
-            if (plot instanceof XYPlot) {
-                final XYPlot xyPlot = (XYPlot)plot;
-                final Axis axis = xyPlot.getRangeAxis(index);
-                if (axis != null) {
-                    return new AxisAdapter(axis, index, false);
-                } else {
-                    final ValueAxis newAxis = new NumberAxis();
-                    xyPlot.setRangeAxis(index, newAxis);
-                    return new AxisAdapter(newAxis, index, false);
+        } finally {
+            try {
+                if (os != null) {
+                    os.flush();
+                    os.close();
                 }
-            } else if (plot instanceof CategoryPlot) {
-                final CategoryPlot categoryPlot = (CategoryPlot)getPlot();
-                final Axis axis = categoryPlot.getRangeAxis(index);
-                if (axis != null) {
-                    return new AxisAdapter(axis, index, false);
-                } else {
-                    final ValueAxis newAxis = new NumberAxis();
-                    categoryPlot.setRangeAxis(index, newAxis);
-                    return new AxisAdapter(newAxis, index, false);
-                }
-            } else {
-                throw new RuntimeException("Unsupported plot type: " + plot.getPlotType());
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
     }
 
 
-    /**
-     * An adapter implementation for the ChartOrientation interface
-     */
-    private class OrientationAdapter implements ChartOrientation {
-
-        private Plot plot;
-
-        /**
-         * Constructor
-         * @param plot  the plot reference
-         */
-        private OrientationAdapter(Plot plot) {
-            this.plot = plot;
-        }
-
-        @Override
-        public void vertical() {
-            if (plot instanceof XYPlot) {
-                ((XYPlot)plot).setOrientation(PlotOrientation.VERTICAL);
-            } else if (plot instanceof CategoryPlot) {
-                ((CategoryPlot)plot).setOrientation(PlotOrientation.VERTICAL);
-            } else {
-                throw new ChartException("Unsupported plot type: " + plot.getClass());
-            }
-        }
-
-        @Override
-        public void horizontal() {
-            if (plot instanceof XYPlot) {
-                ((XYPlot)plot).setOrientation(PlotOrientation.HORIZONTAL);
-            } else if (plot instanceof CategoryPlot) {
-                ((CategoryPlot)plot).setOrientation(PlotOrientation.HORIZONTAL);
-            } else {
-                throw new ChartException("Unsupported plot type: " + plot.getClass());
-            }
-        }
-    }
 
 
     /**
@@ -382,260 +292,6 @@ abstract class JFChartBase<T extends Plot,X extends Comparable> extends ChartBas
     }
 
 
-    /**
-     * A JFreeChart ChartAxis adapter for a ValueAxis
-     */
-    private class AxisAdapter implements ChartAxis {
-
-        private Axis axis;
-        private int index;
-        private boolean domain;
-        private Bounds<?> range;
-
-        /**
-         * Constructor
-         * @param axis      the axis reference
-         * @param index     the index for this axis
-         * @param domain    true if adapter is for domain axis
-         */
-        private AxisAdapter(Axis axis, int index, boolean domain) {
-            this.axis = axis;
-            this.index = index;
-            this.domain = domain;
-        }
-
-        @Override
-        public ChartLabel label() {
-            return new AxisLabelAdapter(axis);
-        }
-
-        @Override
-        public ChartFormat format() {
-            return new AxisFormatAdapter(axis);
-        }
-
-        @Override
-        public ChartTextStyle ticks() {
-            return new AxisStyleAdapter(axis);
-        }
-
-        @Override
-        public ChartAxis asLogScale() {
-            if (axis instanceof CategoryAxis) {
-                throw new ChartException("Cannot convert discrete axis to continuous axis");
-            } else if (!(axis instanceof LogAxis)) {
-                final String label = axis.getLabel();
-                final LogAxis logAxis = new LogAxis(label);
-                logAxis.setLabelFont(axis.getLabelFont());
-                logAxis.setTickLabelFont(axis.getTickLabelFont());
-                logAxis.setLabelPaint(axis.getLabelPaint());
-                logAxis.setTickLabelPaint(axis.getTickLabelPaint());
-                this.axis = logAxis;
-                if (range != null) withRange(range);
-                final Plot plot = getPlot();
-                if (domain && plot instanceof XYPlot) {
-                    ((XYPlot)plot).setDomainAxis(index, logAxis);
-                } else if (!domain && plot instanceof XYPlot) {
-                    ((XYPlot)plot).setRangeAxis(index, logAxis);
-                } else if (plot instanceof CategoryPlot) {
-                    ((CategoryPlot)plot).setRangeAxis(index, logAxis, true);
-                } else {
-                    throw new ChartException("Unsupported plot type for log scale: " + plot);
-                }
-            }
-            return this;
-        }
-
-        @Override
-        public ChartAxis asLinearScale() {
-            if (axis instanceof CategoryAxis) {
-                throw new ChartException("Cannot convert discrete axis to continuous axis");
-            } else if (!(axis instanceof NumberAxis)) {
-                final String label = axis.getLabel();
-                final NumberAxis linearAxis = new NumberAxis(label);
-                linearAxis.setLabelFont(axis.getLabelFont());
-                linearAxis.setTickLabelFont(axis.getTickLabelFont());
-                linearAxis.setLabelPaint(axis.getLabelPaint());
-                linearAxis.setTickLabelPaint(axis.getTickLabelPaint());
-                this.axis = linearAxis;
-                if (range != null) withRange(range);
-                final Plot plot = getPlot();
-                if (domain && plot instanceof XYPlot) {
-                    ((XYPlot)plot).setDomainAxis(index, linearAxis);
-                } else if (!domain && plot instanceof XYPlot) {
-                    ((XYPlot)plot).setRangeAxis(index, linearAxis);
-                } else if (plot instanceof CategoryPlot) {
-                    ((CategoryPlot)plot).setRangeAxis(index, linearAxis);
-                } else {
-                    throw new ChartException("Unsupported plot type for log scale: " + plot);
-                }
-            }
-            return this;
-        }
-
-        @Override
-        public ChartAxis asDateScale() {
-            if (axis instanceof CategoryAxis) {
-                throw new ChartException("Cannot convert discrete axis to continuous axis");
-            } else if (!(axis instanceof NumberAxis)) {
-                final String label = axis.getLabel();
-                final DateAxis dateAxis = new DateAxis(label);
-                dateAxis.setLabelFont(axis.getLabelFont());
-                dateAxis.setTickLabelFont(axis.getTickLabelFont());
-                dateAxis.setLabelPaint(axis.getLabelPaint());
-                dateAxis.setTickLabelPaint(axis.getTickLabelPaint());
-                this.axis = dateAxis;
-                if (range != null) withRange(range);
-                final Plot plot = getPlot();
-                if (domain && plot instanceof XYPlot) {
-                    ((XYPlot)plot).setDomainAxis(index, dateAxis);
-                } else if (!domain && plot instanceof XYPlot) {
-                    ((XYPlot)plot).setRangeAxis(index, dateAxis);
-                } else if (plot instanceof CategoryPlot) {
-                    ((CategoryPlot)plot).setRangeAxis(index, dateAxis);
-                } else {
-                    throw new ChartException("Unsupported plot type for log scale: " + plot);
-                }
-            }
-            return this;
-        }
-
-        @Override
-        public ChartAxis withRange(Bounds<?> range) {
-            this.range = range;
-            if (axis != null) {
-                if (axis instanceof NumberAxis) {
-                    final NumberAxis numberAxis = (NumberAxis)axis;
-                    final double lower = ((Number)range.lower()).doubleValue();
-                    final double upper = ((Number)range.upper()).doubleValue();
-                    final Range autoRange = new Range(lower, upper);
-                    numberAxis.setDefaultAutoRange(autoRange);
-                    numberAxis.setRange(lower, upper);
-                } else if (axis instanceof DateAxis) {
-                    final DateAxis dateAxis = (DateAxis)axis;
-                    final long lower = toEpochMillis(range.lower());
-                    final long upper = toEpochMillis(range.upper());
-                    final Range autoRange = new Range(lower, upper);
-                    dateAxis.setDefaultAutoRange(autoRange);
-                } else {
-                    throw new IllegalStateException("Can only set range of numeric or date axis");
-                }
-            }
-            return this;
-        }
-
-
-        /**
-         * Converts some argument into epoch millis if it can
-         * @param value     the value to convert
-         * @return          the epoch millis
-         */
-        private long toEpochMillis(Object value) {
-            if (value instanceof Number) {
-                return ((Number)value).longValue();
-            } else if (value instanceof Date) {
-                return ((Date)value).getTime();
-            } else if (value instanceof LocalDate) {
-                final LocalDate date = (LocalDate)value;
-                final LocalDateTime localDateTime = LocalDateTime.of(date, LocalTime.MIDNIGHT);
-                return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-            } else {
-                throw new IllegalArgumentException("Cannot resolve date value from " + value);
-            }
-        }
-    }
-
-    /**
-     * A JFreeChart ChartFormat adapter
-     */
-    private class AxisFormatAdapter implements ChartFormat {
-
-        private Axis axis;
-
-        /**
-         * Constructor
-         * @param axis    the axis reference
-         */
-        private AxisFormatAdapter(Axis axis) {
-            this.axis = axis;
-        }
-
-        @Override
-        public void withPattern(String pattern) {
-            if (axis instanceof NumberAxis) {
-                ((NumberAxis)axis).setNumberFormatOverride(new DecimalFormat(pattern));
-            } else if (axis instanceof LogAxis) {
-                ((LogAxis)axis).setNumberFormatOverride(new DecimalFormat(pattern));
-            } else if (axis instanceof DateAxis) {
-                ((DateAxis)axis).setDateFormatOverride(new SimpleDateFormat(pattern));
-            }
-        }
-    }
-
-
-    /**
-     * A JFreeChart ChartLabel adapter for an axis
-     */
-    private class AxisLabelAdapter implements ChartLabel {
-
-        private Axis axis;
-
-        /**
-         * Constructor
-         * @param axis  the axis for this adapter
-         */
-        private AxisLabelAdapter(Axis axis) {
-            this.axis = axis;
-        }
-
-        @Override
-        public ChartLabel withText(String text) {
-            this.axis.setLabel(text);
-            return this;
-        }
-
-        @Override
-        public ChartLabel withColor(Color color) {
-            this.axis.setLabelPaint(color);
-            return this;
-        }
-
-        @Override
-        public ChartLabel withFont(Font font) {
-            this.axis.setLabelFont(font);
-            return this;
-        }
-    }
-
-
-    /**
-     * A JFreeChart text style adapter for an axis
-     */
-    private class AxisStyleAdapter implements ChartTextStyle<ChartTextStyle> {
-
-        private Axis axis;
-
-        /**
-         * Constructor
-         * @param axis  the axis for this adapter
-         */
-        private AxisStyleAdapter(Axis axis) {
-            this.axis = axis;
-        }
-
-        @Override
-        public ChartTextStyle withColor(Color color) {
-            this.axis.setAxisLinePaint(color);
-            this.axis.setTickLabelPaint(color);
-            return this;
-        }
-
-        @Override
-        public ChartTextStyle withFont(Font font) {
-            this.axis.setTickLabelFont(font);
-            return this;
-        }
-    }
 
 
     /**
@@ -705,5 +361,102 @@ abstract class JFChartBase<T extends Plot,X extends Comparable> extends ChartBas
             return this;
         }
     }
+
+
+    /**
+     * The ChartTheme adapter
+     */
+    private class ThemeAdapter implements ChartTheme {
+
+        @Override
+        public void light() {
+            final Color lightColor = Color.WHITE;
+            final Color darkColor = Color.BLACK;
+            freeChart().setBackgroundPaint(lightColor);
+            Optional.ofNullable(freeChart().getTitle()).ifPresent(x -> {
+                x.setPaint(darkColor);
+                x.setBackgroundPaint(lightColor);
+            });
+            Optional.ofNullable(freeChart().getSubtitle(0)).ifPresent(x -> {
+                if (x instanceof TextTitle) {
+                    ((TextTitle)x).setBackgroundPaint(lightColor);
+                    ((TextTitle)x).setPaint(darkColor);
+                }
+            });
+            Optional.ofNullable(freeChart().getLegend()).ifPresent(x -> {
+                x.setBackgroundPaint(lightColor);
+                x.setItemPaint(darkColor);
+            });
+            final Plot plot = freeChart().getPlot();
+            if (plot instanceof XYPlot) {
+                final XYPlot xyPlot = (XYPlot)plot;
+                xyPlot.setBackgroundPaint(lightColor);
+                xyPlot.setDomainGridlinesVisible(true);
+                xyPlot.setRangeGridlinesVisible(true);
+                xyPlot.setDomainGridlinePaint(Color.DARK_GRAY);
+                xyPlot.setRangeGridlinePaint(Color.DARK_GRAY);
+                for (int i=0; i<xyPlot.getDatasetCount(); ++i) {
+                    xyPlot.getDomainAxis().setLabelPaint(darkColor);
+                    xyPlot.getDomainAxis().setTickLabelPaint(darkColor);
+                    xyPlot.getDomainAxis().setLabelPaint(darkColor);
+                    xyPlot.getDomainAxis().setAxisLinePaint(darkColor);
+                    xyPlot.getDomainAxis().setTickMarkPaint(darkColor);
+                }
+                for (int i=0; i<xyPlot.getRangeAxisCount(); ++i) {
+                    xyPlot.getRangeAxis(i).setLabelPaint(darkColor);
+                    xyPlot.getRangeAxis(i).setTickLabelPaint(darkColor);
+                    xyPlot.getRangeAxis(i).setLabelPaint(darkColor);
+                    xyPlot.getRangeAxis(i).setAxisLinePaint(darkColor);
+                    xyPlot.getRangeAxis(i).setTickMarkPaint(darkColor);
+                }
+            }
+        }
+
+        @Override
+        public void dark() {
+            final Color darkColor = Color.BLACK;
+            final Color lightColor = Color.LIGHT_GRAY;
+            freeChart().setBackgroundPaint(darkColor);
+            Optional.ofNullable(freeChart().getTitle()).ifPresent(x -> {
+                x.setPaint(lightColor);
+                x.setBackgroundPaint(darkColor);
+            });
+            Optional.ofNullable(freeChart().getSubtitle(0)).ifPresent(x -> {
+                if (x instanceof TextTitle) {
+                    ((TextTitle)x).setBackgroundPaint(darkColor);
+                    ((TextTitle)x).setPaint(lightColor);
+                }
+            });
+            Optional.ofNullable(freeChart().getLegend()).ifPresent(x -> {
+                x.setBackgroundPaint(darkColor);
+                x.setItemPaint(lightColor);
+            });
+            final Plot plot = freeChart().getPlot();
+            if (plot instanceof XYPlot) {
+                final XYPlot xyPlot = (XYPlot)plot;
+                xyPlot.setBackgroundPaint(darkColor);
+                xyPlot.setDomainGridlinesVisible(true);
+                xyPlot.setRangeGridlinesVisible(true);
+                xyPlot.setDomainGridlinePaint(Color.LIGHT_GRAY);
+                xyPlot.setRangeGridlinePaint(Color.LIGHT_GRAY);
+                for (int i=0; i<xyPlot.getDatasetCount(); ++i) {
+                    xyPlot.getDomainAxis().setLabelPaint(lightColor);
+                    xyPlot.getDomainAxis().setTickLabelPaint(lightColor);
+                    xyPlot.getDomainAxis().setLabelPaint(lightColor);
+                    xyPlot.getDomainAxis().setAxisLinePaint(lightColor);
+                    xyPlot.getDomainAxis().setTickMarkPaint(lightColor);
+                }
+                for (int i=0; i<xyPlot.getRangeAxisCount(); ++i) {
+                    xyPlot.getRangeAxis(i).setLabelPaint(lightColor);
+                    xyPlot.getRangeAxis(i).setTickLabelPaint(lightColor);
+                    xyPlot.getRangeAxis(i).setLabelPaint(lightColor);
+                    xyPlot.getRangeAxis(i).setAxisLinePaint(lightColor);
+                    xyPlot.getRangeAxis(i).setTickMarkPaint(lightColor);
+                }
+            }
+
+        }
+    }
+
 
 }

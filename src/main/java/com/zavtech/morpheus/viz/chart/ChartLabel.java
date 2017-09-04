@@ -15,12 +15,34 @@
  */
 package com.zavtech.morpheus.viz.chart;
 
-public interface ChartLabel extends ChartTextStyle<ChartLabel> {
+import java.awt.Font;
+import java.awt.Color;
+
+/**
+ * An interface to control the content and appearance of a label on a chart
+ *
+ * @author Xavier Witdouck
+ *
+ * <p><strong>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></strong></p>
+ */
+public interface ChartLabel {
 
     /**
      * Sets the text for this label
      * @param text  the text for label
      */
     ChartLabel withText(String text);
+
+    /**
+     * Sets the text color
+     * @param color color value
+     */
+    ChartLabel withColor(Color color);
+
+    /**
+     * Sets the font for this text style
+     * @param font  sets the font for text
+     */
+    ChartLabel withFont(Font font);
 
 }

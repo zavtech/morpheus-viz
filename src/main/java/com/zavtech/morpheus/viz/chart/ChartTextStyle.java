@@ -18,17 +18,24 @@ package com.zavtech.morpheus.viz.chart;
 import java.awt.Color;
 import java.awt.Font;
 
-public interface ChartTextStyle<T extends ChartTextStyle> {
-
-    /**
-     * Sets the text color
-     * @param color color value
-     */
-    T withColor(Color color);
+/**
+ * An interface to control text styling for any text that can appear on a chart.
+ *
+ * @author  Xavier Witdouck
+ *
+ * <p><strong>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></strong></p>
+ */
+public interface ChartTextStyle {
 
     /**
      * Sets the font for this text style
      * @param font  sets the font for text
      */
-    T withFont(Font font);
+    ChartTextStyle withFont(Font font);
+
+    /**
+     * Sets the text color
+     * @param color color value
+     */
+    ChartTextStyle withColor(Color color);
 }

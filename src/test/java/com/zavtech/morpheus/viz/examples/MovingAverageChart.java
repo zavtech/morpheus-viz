@@ -35,10 +35,10 @@ public class MovingAverageChart {
         final LocalDate startDate = LocalDate.of(2013, 6, 14);
         closeSma.update(close, false, true);
         final DataFrame<LocalDate,String> dataset = closeSma.rows().select(row -> row.key().isAfter(startDate));
-        Chart.of(dataset, chart -> {
+        Chart.create().withLinePlot(dataset, chart -> {
             chart.title().withText("Apple");
-            chart.axes().domain().label().withText("Date");
-            chart.axes().range(0).label().withText("Price");
+            chart.plot().axes().domain().label().withText("Date");
+            chart.plot().axes().range(0).label().withText("Price");
             chart.show();
         });
     }

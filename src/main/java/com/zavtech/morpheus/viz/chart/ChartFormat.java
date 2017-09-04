@@ -15,11 +15,17 @@
  */
 package com.zavtech.morpheus.viz.chart;
 
-
+/**
+ * An interface to control value formatting on a chart
+ *
+ * @author Xavier Witdouck
+ *
+ * <p><strong>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></strong></p>
+ */
 public interface ChartFormat {
 
     /**
-     * Sets the format pattern to apply
+     * Sets the format pattern to accept
      * @param pattern   the format pattern
      */
     void withPattern(String pattern);

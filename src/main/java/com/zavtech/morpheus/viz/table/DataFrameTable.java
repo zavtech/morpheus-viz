@@ -481,7 +481,7 @@ public class DataFrameTable extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
                 try {
                     final DataFrameTable parent = DataFrameTable.this;
-                    final String msg = "Select that font to apply to selected cells";
+                    final String msg = "Select that font to accept to selected cells";
                     final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
                     final String[] fonts = ge.getAvailableFontFamilyNames();
                     final String fontName = (String) JOptionPane.showInputDialog(parent, msg, "Font", JOptionPane.INFORMATION_MESSAGE, null, fonts, fonts[0]);
@@ -537,7 +537,7 @@ public class DataFrameTable extends javax.swing.JPanel {
     }
 
     /**
-     * Returns a new action to apply a specific date format to selected cells
+     * Returns a new action to accept a specific date format to selected cells
      * @param pattern   the date format pattern
      * @return          the newly created action
      */
@@ -566,7 +566,7 @@ public class DataFrameTable extends javax.swing.JPanel {
 
 
     /**
-     * Creates a new action to apply a specific type of formatting to selected cells
+     * Creates a new action to accept a specific type of formatting to selected cells
      * @param numberType    the number type
      * @param description the action description
      * @return newly created action
