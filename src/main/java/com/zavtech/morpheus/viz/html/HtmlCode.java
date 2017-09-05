@@ -15,20 +15,23 @@
  */
 package com.zavtech.morpheus.viz.html;
 
+import java.awt.*;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+import com.zavtech.morpheus.util.IO;
+
 /**
- * A convenience API for programmatically creating simple HTML pages in the absence of a templating engine such as Freemarker.
+ * A convenience API for programmatically creating simple HTML pages in the absence of a template engine such as Freemarker.
  *
  * @author Xavier Witdouck
  *
  * <p><strong>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></strong></p>
  */
-public class HtmlWriter {
+public class HtmlCode {
 
     private String indent = "";
     private StringBuilder html = new StringBuilder();
@@ -36,7 +39,7 @@ public class HtmlWriter {
     /**
      * Constructor
      */
-    public HtmlWriter() {
+    public HtmlCode() {
         super();
     }
 
@@ -45,8 +48,8 @@ public class HtmlWriter {
      * @param consumer  the consumer to call on the writer
      * @return          the resulting html string
      */
-    public static String createHtml(Consumer<HtmlWriter> consumer) {
-        final HtmlWriter writer = new HtmlWriter();
+    public static String createHtml(Consumer<HtmlCode> consumer) {
+        final HtmlCode writer = new HtmlCode();
         consumer.accept(writer);
         return writer.toString().trim();
     }
@@ -57,7 +60,7 @@ public class HtmlWriter {
      * @param count     the number of spaces to indent by
      * @return          this writer
      */
-    public HtmlWriter indent(int count) {
+    public HtmlCode indent(int count) {
         final StringBuilder indentation = new StringBuilder(indent);
         for (int i=0; i<count; ++i) {
             indentation.append(" ");
@@ -73,7 +76,7 @@ public class HtmlWriter {
      * @param count the number of spaces to remove
      * @return      this code refernce
      */
-    public HtmlWriter unident(int count) {
+    public HtmlCode unident(int count) {
         this.indent = indent.substring(0, indent.length()-count);
         return this;
     }
@@ -83,7 +86,7 @@ public class HtmlWriter {
      * Starts a new line and indents the new line based on current indentation
      * @return      this code reference
      */
-    public HtmlWriter newLine() {
+    public HtmlCode newLine() {
         this.html.append("\n");
         this.html.append(indent);
         return this;
@@ -95,7 +98,7 @@ public class HtmlWriter {
      * @param args  the arguments for the formatted code string
      * @return      this writer
      */
-    public HtmlWriter write(String line, Object... args) {
+    public HtmlCode write(String line, Object... args) {
         if (args == null || args.length == 0) {
             this.html.append(line);
             return this;
@@ -112,7 +115,7 @@ public class HtmlWriter {
      * @param consumer  the consumer used to configure the element
      * @return          this writer
      */
-    public HtmlWriter newElement(String name, Consumer<HtmlElement> consumer) {
+    public HtmlCode newElement(String name, Consumer<HtmlElement> consumer) {
         final HtmlElement element = new HtmlElement(name, this);
         consumer.accept(element);
         element.close();
@@ -131,6 +134,28 @@ public class HtmlWriter {
     }
 
 
+    /**
+     * Writes the HTML code in this buffer to a temp file and opens it in default browser
+     * @return      the file that contains generated HTML
+     * @throws IOException  if there is an IO Exception
+     */
+    public File browse() throws IOException {
+        return browse(File.createTempFile("chart_", ".html"));
+    }
+
+    /**
+     * Writes the HTML code in this buffer to the output file and opens it in default browser
+     * @param file      the file to write HTML buffer to
+     * @return          the same as argument file
+     * @throws IOException  if there is an IO Exception
+     */
+    public File browse(File file) throws IOException {
+        IO.writeText(html.toString(), file);
+        Desktop.getDesktop().browse(file.toURI());
+        return file;
+    }
+
+
     @Override
     public String toString() {
         return html.toString();
@@ -141,8 +166,8 @@ public class HtmlWriter {
      * @param args
      */
     public static void main(String[] args) {
-        final HtmlWriter writer = new HtmlWriter();
-        writer.newElement("html", html -> {
+        final HtmlCode htmlCode = new HtmlCode();
+        htmlCode.newElement("html", html -> {
             html.newElement("head", head -> {
                 head.newElement("title", title -> title.text("This is a test page"));
                 head.newElement("script", script -> {
@@ -178,7 +203,7 @@ public class HtmlWriter {
                 });
             });
         });
-        System.out.println(writer.toString());
+        System.out.println(htmlCode.toString());
     }
 
 }

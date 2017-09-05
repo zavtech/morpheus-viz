@@ -37,7 +37,7 @@ import com.zavtech.morpheus.viz.chart.Chart;
 import com.zavtech.morpheus.viz.chart.ChartShape;
 import com.zavtech.morpheus.viz.chart.pie.PiePlot;
 import com.zavtech.morpheus.viz.chart.xy.XyPlot;
-import com.zavtech.morpheus.viz.html.HtmlWriter;
+import com.zavtech.morpheus.viz.html.HtmlCode;
 
 /**
  * Class summary goes here...
@@ -501,12 +501,13 @@ public class MultiCharts {
     public void swingCharts2() throws Exception {
         Chart.create().swingMode();
         List<Chart<?>> charts = createCharts();
+        charts.forEach(chart -> chart.options().withPreferredSize(845, 500));
         IO.writeText(Chart.create().javascript(charts), new File("../morpheus-docs/docs/javascript/gallery2.js"));
 
         try {
-            final HtmlWriter htmlWriter = new HtmlWriter();
+            final HtmlCode htmlCode = new HtmlCode();
             final AtomicInteger chartIndex = new AtomicInteger(-1);
-            htmlWriter.newElement("html", html -> {
+            htmlCode.newElement("html", html -> {
                 html.newElement("head", head -> {
                     head.newElement("script", script -> {
                         script.newAttribute("type", "text/javascript");
@@ -514,28 +515,18 @@ public class MultiCharts {
                     });
                 });
 
-                final int cols = 2;
-                final String width = String.valueOf((int)(100d / cols)) + "%";
-                final String height = String.valueOf((int)(100d / cols * 0.9d)) + "%";
                 html.newElement("body", body -> {
                     chartIndex.set(-1);
                     charts.forEach(chart -> {
                         body.newElement("div", div -> {
                             div.newAttribute("id", String.format("chart_%s", chartIndex.incrementAndGet()));
-                            div.newAttribute("style", String.format("width:%s;height:%s;float:left;", width, height));
+                            div.newAttribute("style", "float:left;");
                         });
                     });
                 });
             });
-
-            final File dir = new File(System.getProperty("user.home"), ".morpheus/charts");
-            final File file = new File(dir, UUID.randomUUID().toString() + ".html");
-            if (file.getParentFile().mkdirs()) System.out.println("Created directory: " + dir.getAbsolutePath());
-
-            System.out.println(htmlWriter.toString());
-
-            htmlWriter.flush(file);
-            Desktop.getDesktop().browse(file.toURI());
+            System.out.println(htmlCode.toString());
+            htmlCode.browse();
         } catch (Exception ex) {
             throw new RuntimeException("Failed to generate Google chart", ex);
         }

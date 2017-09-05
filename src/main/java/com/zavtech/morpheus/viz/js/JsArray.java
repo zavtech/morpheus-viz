@@ -28,14 +28,14 @@ public class JsArray {
 
     private int length;
     private boolean inline;
-    private Javascript script;
+    private JsCode script;
 
     /**
      * Constructor
      * @param script    the script to write to
      * @param inline    true if array should be written in one line
      */
-    JsArray(Javascript script, boolean inline) {
+    JsArray(JsCode script, boolean inline) {
         this.script = script;
         this.inline = inline;
     }

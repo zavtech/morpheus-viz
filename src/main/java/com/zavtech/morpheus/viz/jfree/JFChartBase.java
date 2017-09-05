@@ -15,13 +15,14 @@
  */
 package com.zavtech.morpheus.viz.jfree;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.*;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Base64;
 import java.util.Optional;
 import javax.swing.JFrame;
 
@@ -43,6 +44,7 @@ import com.zavtech.morpheus.viz.chart.ChartLabel;
 import com.zavtech.morpheus.viz.chart.ChartLegend;
 import com.zavtech.morpheus.viz.chart.ChartOptions;
 import com.zavtech.morpheus.viz.chart.ChartTheme;
+import com.zavtech.morpheus.viz.js.JsCode;
 
 /**
  * A convenience base class for building various types of chart types
@@ -223,6 +225,40 @@ abstract class JFChartBase<P> implements Chart<P>, ChartMouseListener {
         }
     }
 
+
+    @Override
+    public void accept(JsCode jsCode, String functionName, String divId) {
+        try {
+            final String base64Image = toBase64Image();
+            jsCode.newFunction(functionName, func -> {
+                func.write("var divElement = document.getElementById('%s');", divId);
+                func.newLine().write("var imageElement = document.createElement('img');");
+                func.newLine().write("imageElement.setAttribute('src', 'data:image/png;base64, %s');", base64Image);
+                func.newLine().write("imageElement.setAttribute('alt', 'Embedded Chart');");
+                func.newLine().write("imageElement.setAttribute('class', 'chart');");
+                func.newLine().write("divElement.appendChild(imageElement);");
+            });
+        } catch (IOException ex) {
+            throw new ChartException("Failed to generate base64 image of chart", ex);
+        }
+    }
+
+
+    /**
+     * Returns a base64 encoded string of a PNG image generated from this chart
+     * @return          the base64 encoded image
+     * @throws IOException  if there is an I/O exception
+     */
+    String toBase64Image() throws IOException {
+        final double width = this.options().getPreferredSize().map(Dimension::getWidth).orElse(700d);
+        final double height = this.options().getPreferredSize().map(Dimension::getHeight).orElse(400d);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        this.writerPng(baos, (int)width, (int)height, true);
+        final byte[] imageBytes = baos.toByteArray();
+        final Base64.Encoder encoder = Base64.getEncoder();
+        final byte[] base64 = encoder.encode(imageBytes);
+        return new String(base64);
+    }
 
 
 

@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.OutputStream;
 import java.util.stream.Stream;
 
+import com.zavtech.morpheus.viz.js.JsCode;
+
 /**
  * The top level interface to the Morpheus Chart abstraction API which can be implemented against various underlying libraries.
  *
@@ -125,6 +127,15 @@ public interface Chart<P> {
      * @return              this chart
      */
     Chart writerPng(OutputStream os, int width, int height, boolean transparent);
+
+    /**
+     * Writes a Javascript function with the name specified that will render this chart
+     * @param jsCode            the Javascript code generator
+     * @param functionName      the function name for this chart's plot instructions
+     * @param divId             the ID of the div element in which to draw chart
+     */
+    void accept(JsCode jsCode, String functionName, String divId);
+
 
 
 }

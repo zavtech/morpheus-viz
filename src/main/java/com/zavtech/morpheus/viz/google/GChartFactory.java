@@ -27,8 +27,8 @@ import com.zavtech.morpheus.viz.chart.Chart;
 import com.zavtech.morpheus.viz.chart.ChartFactory;
 import com.zavtech.morpheus.viz.chart.pie.PiePlot;
 import com.zavtech.morpheus.viz.chart.xy.XyPlot;
-import com.zavtech.morpheus.viz.html.HtmlWriter;
-import com.zavtech.morpheus.viz.js.Javascript;
+import com.zavtech.morpheus.viz.html.HtmlCode;
+import com.zavtech.morpheus.viz.js.JsCode;
 
 /**
  * A ChartEngine implementation used to create Google chart instances based on the Morpheus charting API.
@@ -64,22 +64,22 @@ public class GChartFactory implements ChartFactory {
 
     @Override
     public String javascript(Chart... charts) {
-        return Javascript.create(jsWriter -> {
-            jsWriter.newLine().write("google.charts.load('current', {'packages':['corechart']});");
-            jsWriter.newLine().write("google.charts.setOnLoadCallback(%s);", "drawCharts");
-            jsWriter.newLine();
-            jsWriter.newFunction("drawCharts", init -> {
+        return JsCode.create(jsCode -> {
+            jsCode.newLine().write("google.charts.load('current', {'packages':['corechart']});");
+            jsCode.newLine().write("google.charts.setOnLoadCallback(%s);", "drawCharts");
+            jsCode.newLine();
+            jsCode.newFunction("drawCharts", init -> {
                 for (int i=0; i<charts.length; ++i) {
                     init.write("drawChart_%s()", i);
                     init.newLine();
                 }
             });
             for (int i=0; i<charts.length; ++i) {
-                final GChart gChart = (GChart)charts[i];
+                final Chart chart = charts[i];
                 final String functionName = String.format("drawChart_%s", i);
-                final String divName = String.format("chart_%s", i);
-                jsWriter.newLine().newLine();
-                gChart.accept(jsWriter, functionName, divName);
+                final String divId = chart.options().getId().orElse(String.format("chart_%s", i));
+                jsCode.newLine().newLine();
+                chart.accept(jsCode, functionName, divId);
             }
         });
     }
@@ -94,9 +94,9 @@ public class GChartFactory implements ChartFactory {
     @Override
     public void show(int columns, Iterable<Chart<?>> charts) {
         try {
-            final HtmlWriter htmlWriter = new HtmlWriter();
+            final HtmlCode htmlCode = new HtmlCode();
             final AtomicInteger chartIndex = new AtomicInteger(-1);
-            htmlWriter.newElement("html", html -> {
+            htmlCode.newElement("html", html -> {
                 html.newElement("head", head -> {
                     head.newElement("script", script -> {
                         script.newAttribute("type", "text/javascript");
@@ -125,9 +125,9 @@ public class GChartFactory implements ChartFactory {
             final File file = new File(dir, UUID.randomUUID().toString() + ".html");
             if (file.getParentFile().mkdirs()) System.out.println("Created directory: " + dir.getAbsolutePath());
 
-            System.out.println(htmlWriter.toString());
+            System.out.println(htmlCode.toString());
 
-            htmlWriter.flush(file);
+            htmlCode.flush(file);
             Desktop.getDesktop().browse(file.toURI());
         } catch (Exception ex) {
             throw new RuntimeException("Failed to generate Google chart", ex);
