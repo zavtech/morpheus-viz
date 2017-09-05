@@ -36,7 +36,7 @@ Chart.create().asHtml().withLinePlot(frame, chart -> {
 ```
 
 The following sections demonstrate how to use the Morpheus charting API, and provide various examples of what kind of 
-charts are supported. The illustrations below are PNG files generated using the JFreeChart adapter, however a [gallery](./gallery1) 
+charts are supported. The illustrations below are PNG files generated using the JFreeChart adapter, however a [gallery](http://www.zavtech.com/morpheus/docs/viz/charts/gallery1/) 
 of the same plots generated via the **Google adapter** show just how similar the plots from the two implementations are. 
 While most of the functionality exposed by the Morpheus Charting API are supported by both adapters, there are some gaps 
 in the Google adapter which are documented below.
