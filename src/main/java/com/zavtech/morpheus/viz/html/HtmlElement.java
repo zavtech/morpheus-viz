@@ -35,7 +35,7 @@ public class HtmlElement {
 
     private String name;
     private boolean attrs;
-    private HtmlWriter writer;
+    private HtmlCode writer;
     private boolean mixedContent;
 
     /**
@@ -66,7 +66,7 @@ public class HtmlElement {
      * @param name      the name for this element
      * @param writer    the writer
      */
-    HtmlElement(String name, HtmlWriter writer) {
+    HtmlElement(String name, HtmlCode writer) {
         this.name = name;
         this.attrs = true;
         this.writer = writer;

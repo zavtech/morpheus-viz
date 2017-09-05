@@ -31,8 +31,8 @@ import com.zavtech.morpheus.viz.chart.ChartLegend;
 import com.zavtech.morpheus.viz.chart.ChartOptions;
 import com.zavtech.morpheus.viz.chart.ChartTheme;
 import com.zavtech.morpheus.viz.chart.pie.PiePlot;
-import com.zavtech.morpheus.viz.html.HtmlWriter;
-import com.zavtech.morpheus.viz.js.Javascript;
+import com.zavtech.morpheus.viz.html.HtmlCode;
+import com.zavtech.morpheus.viz.js.JsCode;
 
 /**
  * A Chart implementation that uses the Google Charting library to render charts in a browser
@@ -100,7 +100,7 @@ class GChart<P> implements Chart<P> {
         try {
             final String divName = "chart1";
             final String functionName = "drawChart1";
-            final HtmlWriter writer = new HtmlWriter();
+            final HtmlCode writer = new HtmlCode();
             writer.newElement("html", html -> {
                 html.newElement("head", head -> {
                     head.newElement("script", script -> {
@@ -109,7 +109,7 @@ class GChart<P> implements Chart<P> {
                     });
                     head.newElement("script", script -> {
                         script.newAttribute("type", "text/javascript");
-                        script.text(Javascript.create(js -> {
+                        script.text(JsCode.create(js -> {
                             js.newLine().write("google.charts.load('current', {'packages':['corechart']});");
                             js.newLine().write("google.charts.setOnLoadCallback(%s);", functionName);
                             this.accept(js, functionName, divName);
@@ -153,32 +153,10 @@ class GChart<P> implements Chart<P> {
     }
 
 
-    /**
-     * Returns the title / subtitle combo
-     * @return  the title / subtitle combo
-     */
-    private String createTitle() {
-        final StringBuilder result = new StringBuilder();
-        if (title.getText() != null) result.append(title.getText());
-        if (subtitle.getText() != null) {
-            final boolean brackets = result.length() > 0;
-            result.append(brackets ? " - (" : "");
-            result.append(subtitle.getText());
-            result.append(brackets ? ")" : "");
-        }
-        return result.toString();
-    }
-
-
-    /**
-     * Writes the chart Javascript using the function and div name specified
-     * @param js                the Javascript writer
-     * @param functionName      the function name for chart
-     * @param divName           the div name in which to draw chart
-     */
-    void accept(Javascript js, String functionName, String divName) {
-        js.write("/** This is code generation by the Morpheus Visualization library */");
-        js.newFunction(functionName, func -> {
+    @Override
+    public void accept(JsCode jsCode, String functionName, String divId) {
+        jsCode.write("/** This is code generation by the Morpheus Visualization library */");
+        jsCode.newFunction(functionName, func -> {
             if (plot() instanceof GXyPlot) {
                 final GXyModel model = (GXyModel)((GXyPlot)plot).data();
                 final GXyDataset dataset = model.getUnifiedDataset();
@@ -235,10 +213,27 @@ class GChart<P> implements Chart<P> {
 
             func.write(";");
             func.newLine();
-            func.newLine().write("var target = document.getElementById('%s');", divName);
+            func.newLine().write("var target = document.getElementById('%s');", divId);
             func.newLine().write("var chart = new google.visualization.%s(target);", getChartType());
             func.newLine().write("chart.draw(data, options);");
         });
+    }
+
+
+    /**
+     * Returns the title / subtitle combo
+     * @return  the title / subtitle combo
+     */
+    private String createTitle() {
+        final StringBuilder result = new StringBuilder();
+        if (title.getText() != null) result.append(title.getText());
+        if (subtitle.getText() != null) {
+            final boolean brackets = result.length() > 0;
+            result.append(brackets ? " - (" : "");
+            result.append(subtitle.getText());
+            result.append(brackets ? ")" : "");
+        }
+        return result.toString();
     }
 
 

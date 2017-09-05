@@ -18,13 +18,13 @@ package com.zavtech.morpheus.viz.js;
 import java.util.function.Consumer;
 
 /**
- * A class that provides a basic API to programmatically generate simple Javascript instructions
+ * A class that provides a basic API to programmatically generate simple Javascript code
  *
  * @author Xavier Witdouck
  *
  * <p><strong>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></strong></p>
  */
-public class Javascript {
+public class JsCode {
 
     private String indent = "";
     private StringBuilder code = new StringBuilder();
@@ -33,7 +33,7 @@ public class Javascript {
     /**
      * Constructor
      */
-    public Javascript() {
+    public JsCode() {
         super();
     }
 
@@ -42,8 +42,8 @@ public class Javascript {
      * @param consumer  the consumer to write Javascript programmatically
      * @return          the Javascript string
      */
-    public static String create(Consumer<Javascript> consumer) {
-        final Javascript js = new Javascript();
+    public static String create(Consumer<JsCode> consumer) {
+        final JsCode js = new JsCode();
         consumer.accept(js);
         return js.toString();
     }
@@ -53,7 +53,7 @@ public class Javascript {
      * Deletes the entire code buffer
      * @return  this writer
      */
-    public Javascript clear() {
+    public JsCode clear() {
         this.code.delete(0, code.length());
         return this;
     }
@@ -65,7 +65,7 @@ public class Javascript {
      * @param args  the arguments for the formatted code string
      * @return      this writer
      */
-    public Javascript write(String code, Object... args) {
+    public JsCode write(String code, Object... args) {
         this.code.append(String.format(code, args));
         return this;
     }
@@ -75,7 +75,7 @@ public class Javascript {
      * Starts a new line and indents the new line based on current indentation
      * @return      this code reference
      */
-    public Javascript newLine() {
+    public JsCode newLine() {
         return newLine(1);
     }
 
@@ -83,7 +83,7 @@ public class Javascript {
      * Starts a new line and indents the new line based on current indentation
      * @return      this code reference
      */
-    public Javascript newLine(int count) {
+    public JsCode newLine(int count) {
         for (int i=0; i<count; ++i) {
             this.code.append("\n");
         }
@@ -97,7 +97,7 @@ public class Javascript {
      * @param count     the number of spaces to indent by
      * @return          this writer
      */
-    public Javascript indent(int count) {
+    public JsCode indent(int count) {
         final StringBuilder indentation = new StringBuilder(indent);
         for (int i=0; i<count; ++i) {
             indentation.append(" ");
@@ -113,7 +113,7 @@ public class Javascript {
      * @param count the number of spaces to remove
      * @return      this code refernce
      */
-    public Javascript unident(int count) {
+    public JsCode unident(int count) {
         this.indent = indent.substring(0, indent.length()-count);
         return this;
     }
@@ -124,17 +124,17 @@ public class Javascript {
      * @param consumer  the consumer with the object write instructions
      * @return          this writer
      */
-    public Javascript newObject(Consumer<JsObject> consumer) {
+    public JsCode newObject(Consumer<JsObject> consumer) {
         return newObject(false, consumer);
     }
 
 
-    public Javascript newFunction(String name, Consumer<Javascript> consumer) {
+    public JsCode newFunction(String name, Consumer<JsCode> consumer) {
         return newFunction(name, null, consumer);
     }
 
 
-    public Javascript newFunction(String name, String args, Consumer<Javascript> consumer) {
+    public JsCode newFunction(String name, String args, Consumer<JsCode> consumer) {
         this.newLine();
         this.write("function %s(", name);
         this.write(args != null ? args : "");
@@ -155,7 +155,7 @@ public class Javascript {
      * @param consumer      the consumer with the object write instructions
      * @return              this writer
      */
-    public Javascript newObject(boolean inline, Consumer<JsObject> consumer) {
+    public JsCode newObject(boolean inline, Consumer<JsObject> consumer) {
         this.write("{");
         this.indent(4);
         this.newLine();
@@ -172,7 +172,7 @@ public class Javascript {
      * @param consumer  the consumer with array element instructions
      * @return          this writer
      */
-    public Javascript newArray(Consumer<JsArray> consumer) {
+    public JsCode newArray(Consumer<JsArray> consumer) {
         return newArray(false, consumer);
     }
 
@@ -183,7 +183,7 @@ public class Javascript {
      * @param consumer      the consumer with the array write instructions
      * @return              this writer
      */
-    public Javascript newArray(boolean inline, Consumer<JsArray> consumer) {
+    public JsCode newArray(boolean inline, Consumer<JsArray> consumer) {
         this.code.append("[");
         if (!inline) {
             //this.indent(4);
@@ -207,7 +207,7 @@ public class Javascript {
 
 
     public static void main(String[] args) {
-        final Javascript code = new Javascript();
+        final JsCode code = new JsCode();
         code.write("x = ");
         code.newObject(object -> {
             object.newAttribute("zav", "witdouck");

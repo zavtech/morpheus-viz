@@ -18,7 +18,7 @@ package com.zavtech.morpheus.viz.google;
 import java.util.function.Consumer;
 
 import com.zavtech.morpheus.viz.chart.pie.PieModelDefault;
-import com.zavtech.morpheus.viz.js.Javascript;
+import com.zavtech.morpheus.viz.js.JsCode;
 
 /**
  * A PieModel implementation for the Morpheus Google Charts adapter.
@@ -27,7 +27,7 @@ import com.zavtech.morpheus.viz.js.Javascript;
  *
  * <p><strong>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></strong></p>
  */
-class GPieModel<X extends Comparable,S extends Comparable> extends PieModelDefault<X,S> implements Consumer<Javascript> {
+class GPieModel<X extends Comparable,S extends Comparable> extends PieModelDefault<X,S> implements Consumer<JsCode> {
 
     /**
      * Constructor
@@ -38,7 +38,7 @@ class GPieModel<X extends Comparable,S extends Comparable> extends PieModelDefau
 
 
     @Override
-    public void accept(Javascript script) {
+    public void accept(JsCode script) {
         script.newArray(data -> {
             data.appendArray(false, header -> {
                 header.appendObject(true, domain -> {

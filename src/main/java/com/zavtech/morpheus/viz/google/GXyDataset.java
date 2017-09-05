@@ -33,7 +33,7 @@ import com.zavtech.morpheus.frame.DataFrame;
 import com.zavtech.morpheus.range.Range;
 import com.zavtech.morpheus.util.IO;
 import com.zavtech.morpheus.viz.chart.xy.XyDataset;
-import com.zavtech.morpheus.viz.js.Javascript;
+import com.zavtech.morpheus.viz.js.JsCode;
 
 /**
  * An implementation of the XyDataset interface to be used with Google charts
@@ -284,7 +284,7 @@ class GXyDataset<X extends Comparable,S extends Comparable> implements XyDataset
     }
 
 
-    public void accept(Javascript script) {
+    public void accept(JsCode script) {
         final Class<?> domainClass = domainType();
         final GDataType domainType = GDataType.getDataType(domainClass, GDataType.STRING);
         script.newArray(array -> {
@@ -353,7 +353,7 @@ class GXyDataset<X extends Comparable,S extends Comparable> implements XyDataset
         final Array<String> colAxis = Array.of("A", "B", "C", "D");
         final DataFrame<LocalDate,String> frame = DataFrame.ofDoubles(rowAxis, colAxis, v -> Math.random());
         final GXyDataset dataset = GXyDataset.of(() -> frame);
-        final Javascript js = new Javascript();
+        final JsCode js = new JsCode();
         dataset.accept(js);
         IO.println(js.toString());
     }

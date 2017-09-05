@@ -16,6 +16,7 @@
 package com.zavtech.morpheus.viz.chart;
 
 import java.awt.*;
+import java.util.Optional;
 
 /**
  * An interface that allows for control of various additional options for a Chart.
@@ -27,10 +28,23 @@ import java.awt.*;
 public interface ChartOptions {
 
     /**
+     * Returns the id for this chart
+     * @return      the id for chart
+     */
+    Optional<String> getId();
+
+    /**
      * Returns the preferred size for this chart
      * @return      the preferred size
      */
-    Dimension getPreferredSize();
+    Optional<Dimension> getPreferredSize();
+
+    /**
+     * Sets an id for this chart
+     * @param id    the id string for chart
+     * @return      these options
+     */
+    ChartOptions withId(String id);
 
     /**
      * Sets the preferred size for the chart
@@ -46,11 +60,23 @@ public interface ChartOptions {
      */
     class Default implements ChartOptions {
 
+        private String id;
         private Dimension preferredSize = new Dimension(800, 500);
 
         @Override
-        public Dimension getPreferredSize() {
-            return preferredSize;
+        public Optional<String> getId() {
+            return Optional.ofNullable(id);
+        }
+
+        @Override
+        public Optional<Dimension> getPreferredSize() {
+            return Optional.ofNullable(preferredSize);
+        }
+
+        @Override
+        public ChartOptions withId(String id) {
+            this.id = id;
+            return this;
         }
 
         @Override

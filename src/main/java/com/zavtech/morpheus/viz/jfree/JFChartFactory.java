@@ -16,14 +16,11 @@
 package com.zavtech.morpheus.viz.jfree;
 
 import java.awt.*;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.security.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -35,11 +32,10 @@ import javax.swing.*;
 
 import com.zavtech.morpheus.util.Collect;
 import com.zavtech.morpheus.viz.chart.Chart;
-import com.zavtech.morpheus.viz.chart.ChartException;
 import com.zavtech.morpheus.viz.chart.ChartFactory;
 import com.zavtech.morpheus.viz.chart.pie.PiePlot;
 import com.zavtech.morpheus.viz.chart.xy.XyPlot;
-import com.zavtech.morpheus.viz.js.Javascript;
+import com.zavtech.morpheus.viz.js.JsCode;
 
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.NumberAxis;
@@ -110,30 +106,22 @@ public class JFChartFactory implements ChartFactory {
 
     @Override
     public String javascript(Chart... charts) {
-        return Javascript.create(jsWriter -> {
-            try {
-                jsWriter.newLine().write("window.onload = function() {");
-                jsWriter.indent(4);
-                jsWriter.newLine().write("console.info('Writing charts...');");
+        return JsCode.create(jsCode -> {
+            jsCode.newLine().write("window.onload = drawCharts");
+            jsCode.newLine();
+            jsCode.newFunction("drawCharts", init -> {
+                jsCode.write("console.info('Writing charts...');");
                 for (int i=0; i<charts.length; ++i) {
-                    final String id = String.format("chart_%s", i);
-                    final String image = toBase64Image(charts[i]);
-                    jsWriter.newLine();
-                    jsWriter.write("drawChart('%s', '%s');", id, image);
+                    init.newLine();
+                    init.write("drawChart_%s();", i);
                 }
-                jsWriter.unident(4);
-                jsWriter.newLine().write("};");
-                jsWriter.newLine().newLine();
-                jsWriter.newFunction("drawChart", "chartId, imageString", func -> {
-                    func.write("var divElement = document.getElementById(chartId);");
-                    func.newLine().write("var imageElement = document.createElement('img');");
-                    func.newLine().write("imageElement.setAttribute('src', 'data:image/png;base64,' + imageString);");
-                    func.newLine().write("imageElement.setAttribute('alt', 'Embedded Chart');");
-                    func.newLine().write("imageElement.setAttribute('class', 'chart');");
-                    func.newLine().write("divElement.appendChild(imageElement);");
-                });
-            } catch (Exception ex) {
-                throw new ChartException("Failed to generate Javascript for charts", ex);
+            });
+            for (int i=0; i<charts.length; ++i) {
+                final Chart chart = charts[i];
+                final String functionName = String.format("drawChart_%s", i);
+                final String divId = chart.options().getId().orElse(String.format("chart_%s", i));
+                jsCode.newLine().newLine();
+                chart.accept(jsCode, functionName, divId);
             }
         });
     }
@@ -188,7 +176,6 @@ public class JFChartFactory implements ChartFactory {
     }
 
 
-
     /**
      * Returns true if the data type is time series related
      * @param type  the data type
@@ -196,24 +183,6 @@ public class JFChartFactory implements ChartFactory {
      */
     private boolean isTimeBased(Class<?> type) {
         return timeTypeSet.contains(type);
-    }
-
-
-    /**
-     * Returns a base64 encoded string of a PNG image generated from the chart
-     * @param chart     the chart reference
-     * @return          the base64 encoded image
-     * @throws IOException  if there is an I/O exception
-     */
-    private String toBase64Image(Chart chart) throws IOException {
-        final int width = (int)chart.options().getPreferredSize().getWidth();
-        final int height = (int)chart.options().getPreferredSize().getHeight();
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        chart.writerPng(baos, width, height, true);
-        final byte[] imageBytes = baos.toByteArray();
-        final Base64.Encoder encoder = Base64.getEncoder();
-        final byte[] base64 = encoder.encode(imageBytes);
-        return new String(base64);
     }
 
 }

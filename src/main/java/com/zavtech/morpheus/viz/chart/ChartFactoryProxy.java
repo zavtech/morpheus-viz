@@ -21,10 +21,12 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.zavtech.morpheus.util.Collect;
 import com.zavtech.morpheus.viz.chart.pie.PiePlot;
 import com.zavtech.morpheus.viz.chart.xy.XyPlot;
 import com.zavtech.morpheus.viz.google.GChartFactory;
 import com.zavtech.morpheus.viz.jfree.JFChartFactory;
+import com.zavtech.morpheus.viz.js.JsCode;
 
 /**
  * A ChartFactory that delegates all calls to some underlying factory that is implemented against a specific charting framework.
@@ -84,14 +86,42 @@ public class ChartFactoryProxy implements ChartFactory {
 
 
     @Override
-    public String javascript(Chart... charts) {
-        return defaultFactory.javascript(charts);
+    public String javascript(Chart<?>... charts) {
+        return this.javascript(Collect.asList(charts));
     }
 
 
     @Override
     public String javascript(Iterable<Chart<?>> charts) {
-        return defaultFactory.javascript(charts);
+        if (isMixedCharts(charts)) {
+            final List<Chart<?>> chartList = Collect.asList(charts);
+            return JsCode.create(jsCode -> {
+                jsCode.newLine().write("google.charts.load('current', {'packages':['corechart']});");
+                jsCode.newLine().write("google.charts.setOnLoadCallback(%s);", "drawCharts");
+                jsCode.newLine();
+                jsCode.newFunction("drawCharts", init -> {
+                    for (int i=0; i<chartList.size(); ++i) {
+                        init.write("drawChart_%s()", i);
+                        init.newLine();
+                    }
+                });
+                for (int i=0; i<chartList.size(); ++i) {
+                    final Chart chart = chartList.get(i);
+                    final String functionName = String.format("drawChart_%s", i);
+                    final String divId = chart.options().getId().orElse(String.format("chart_%s", i));
+                    jsCode.newLine().newLine();
+                    chart.accept(jsCode, functionName, divId);
+                }
+            });
+        } else if (containsSwingCharts(charts)) {
+            return swingFactory.javascript(charts);
+        } else if (containsHtmlCharts(charts)) {
+            return htmlFactory.javascript(charts);
+        } else if (charts.iterator().hasNext()) {
+            throw new IllegalArgumentException("Unrecognized chart type in Iterable");
+        } else {
+            return "console.info('No charts!')";
+        }
     }
 
 
@@ -132,5 +162,45 @@ public class ChartFactoryProxy implements ChartFactory {
     @Override
     public <X extends Comparable, S extends Comparable> Chart<PiePlot<X, S>> ofPiePlot(boolean is3d, Consumer<Chart<PiePlot<X, S>>> configurator) {
         return defaultFactory.ofPiePlot(is3d, configurator);
+    }
+
+
+    /**
+     * Returns true if the charts are a mix of swing and html charts
+     * @param charts    the iterable of charts
+     * @return          true if mixed content
+     */
+    private boolean isMixedCharts(Iterable<Chart<?>> charts) {
+        return containsHtmlCharts(charts) && containsSwingCharts(charts);
+    }
+
+
+    /**
+     * Returns true if the charts include html charts
+     * @param charts    the iterable of charts
+     * @return          true if html charts
+     */
+    private boolean containsHtmlCharts(Iterable<Chart<?>> charts) {
+        for (Chart<?> chart : charts) {
+            if (htmlFactory.isSupported(chart)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Returns true if the charts include swing charts
+     * @param charts    the iterable of charts
+     * @return          true if swing charts
+     */
+    private boolean containsSwingCharts(Iterable<Chart<?>> charts) {
+        for (Chart<?> chart : charts) {
+            if (swingFactory.isSupported(chart)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

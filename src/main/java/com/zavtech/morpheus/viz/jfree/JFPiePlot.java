@@ -33,7 +33,7 @@ import com.zavtech.morpheus.viz.chart.pie.PieModel;
 import com.zavtech.morpheus.viz.chart.pie.PieLabels;
 import com.zavtech.morpheus.viz.chart.pie.PiePlot;
 import com.zavtech.morpheus.viz.chart.pie.PieSection;
-import com.zavtech.morpheus.viz.html.HtmlWriter;
+import com.zavtech.morpheus.viz.html.HtmlCode;
 import com.zavtech.morpheus.viz.util.ColorModel;
 
 /**
@@ -171,7 +171,7 @@ class JFPiePlot<X extends Comparable,S extends Comparable> implements PiePlot<X,
         try {
             final double value = Optional.ofNullable(dataset.getValue(key)).map(Number::doubleValue).orElse(Double.NaN);
             if (!Double.isNaN(value)) {
-                return HtmlWriter.createHtml(writer -> {
+                return HtmlCode.createHtml(writer -> {
                     writer.newElement("html", html -> {
                         final double total = DatasetUtilities.calculatePieDatasetTotal(dataset);
                         final double percent = value / total;

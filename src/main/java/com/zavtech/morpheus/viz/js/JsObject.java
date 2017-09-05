@@ -26,7 +26,7 @@ import java.util.function.Consumer;
  */
 public class JsObject {
 
-    private Javascript script;
+    private JsCode script;
     private boolean inline;
     private int attributeCount = 0;
     private boolean ignoreNulls = false;
@@ -36,7 +36,7 @@ public class JsObject {
      * @param script    the script this object will write to
      * @param inline    true to print this object on one line
      */
-    JsObject(Javascript script, boolean inline) {
+    JsObject(JsCode script, boolean inline) {
         this.script = script;
         this.inline = inline;
     }

@@ -46,7 +46,7 @@ import com.zavtech.morpheus.viz.chart.xy.XyPlotBase;
 import com.zavtech.morpheus.viz.chart.xy.XyRender;
 import com.zavtech.morpheus.viz.chart.xy.XyTrend;
 import com.zavtech.morpheus.viz.chart.xy.XyTrendBase;
-import com.zavtech.morpheus.viz.html.HtmlWriter;
+import com.zavtech.morpheus.viz.html.HtmlCode;
 
 /**
  * The plot implementation for JFreeChart xy plots.
@@ -184,7 +184,7 @@ class JFXyPlot<X extends Comparable> extends XyPlotBase<X> {
                 final DateFormat formatter = dateFormat != null ? dateFormat : new SimpleDateFormat("dd-MMM-yyyy HH:mm");
                 final String xLabel = formatter.format(new Date((long)x));
                 final String yLabel = decimalFormat.format(y);
-                return HtmlWriter.createHtml(writer -> {
+                return HtmlCode.createHtml(writer -> {
                     writer.newElement("html", html -> {
                         html.newElement("h2", h2 -> h2.text(seriesKey.toString()));
                         html.newElement("h3", h3 -> h3.text(String.format("X = %s, Y = %s", xLabel, yLabel)));
@@ -193,7 +193,7 @@ class JFXyPlot<X extends Comparable> extends XyPlotBase<X> {
             } else {
                 final String xLabel = decimalFormat.format(x);
                 final String yLabel = decimalFormat.format(y);
-                return HtmlWriter.createHtml(writer -> {
+                return HtmlCode.createHtml(writer -> {
                     writer.newElement("html", html -> {
                         html.newElement("h2", h2 -> h2.text(seriesKey.toString()));
                         html.newElement("h3", h3 -> h3.text(String.format("X = %s, Y = %s", xLabel, yLabel)));
@@ -224,7 +224,7 @@ class JFXyPlot<X extends Comparable> extends XyPlotBase<X> {
                 final String slope = decimalFormat.format(trend.slope());
                 final String intercept = decimalFormat.format(trend.intercept());
                 final String equation = String.format("Y = %s * X + %s", slope, intercept);
-                return HtmlWriter.createHtml(writer -> {
+                return HtmlCode.createHtml(writer -> {
                     writer.newElement("html", html -> {
                         html.newElement("h2", h2 -> h2.text(seriesKey.toString()));
                         html.newElement("h3", h3 -> h3.text(equation));
