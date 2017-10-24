@@ -32,6 +32,7 @@ class GXyRender implements XyRender {
 
     enum Type { DOTS, SHAPES, BARS, LINES, AREA, SPLINE }
 
+    private int pointSize = 4;
     private boolean stacked = false;
     private boolean spline = false;
     private boolean dashed = false;
@@ -112,16 +113,39 @@ class GXyRender implements XyRender {
         return type == Type.DOTS || type == Type.SHAPES;
     }
 
+    /**
+     * Returns true if dot rendering is set
+     * @return  true if dot rendering
+     */
+    boolean isDots() {
+        return type == Type.DOTS;
+    }
+
+    /**
+     * Returns the points size for dot rendering
+     * @return  the point size
+     */
+    int getPointSize() {
+        return pointSize;
+    }
+
 
     @Override
     public void withDots() {
+        this.withDots(4);
+    }
+
+
+    @Override
+    public void withDots(int diameter) {
         this.type = Type.DOTS;
         this.shapes = false;
         this.dashed = false;
         this.spline = false;
         this.stacked = false;
-    }
+        this.pointSize = diameter;
 
+    }
 
     @Override
     public void withArea(boolean stacked) {

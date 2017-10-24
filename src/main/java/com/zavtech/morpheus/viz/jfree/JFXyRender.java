@@ -56,7 +56,13 @@ class JFXyRender implements XyRender {
 
     @Override
     public void withDots() {
-        this.plot.underlying().setRenderer(index, new MorpheusDotRenderer(index));
+        this.withDots(4);
+    }
+
+
+    @Override
+    public void withDots(int diameter) {
+        this.plot.underlying().setRenderer(index, new MorpheusDotRenderer(index, diameter));
     }
 
 
@@ -430,22 +436,24 @@ class JFXyRender implements XyRender {
     private class MorpheusDotRenderer extends XYLineAndShapeRenderer {
 
         private int datasetIndex;
-        private Shape shape = new Ellipse2D.Double(-4/2, -4/2, 4, 4);
+        private Shape dotShape;
 
         /**
          * Constructor
          * @param datasetIndex  the dataset index
+         * @param diameter      the diameter in pixels
          */
-        MorpheusDotRenderer(int datasetIndex) {
+        MorpheusDotRenderer(int datasetIndex, int diameter) {
             this.datasetIndex = datasetIndex;
-            this.setBaseShape(shape);
+            this.dotShape = new Ellipse2D.Double(-4/2, -4/2, diameter, diameter);
+            this.setBaseShape(dotShape);
             this.setBaseLinesVisible(false);
             this.setBaseShapesVisible(true);
             this.setBaseToolTipGenerator(plot::getXyTooltip);
         }
 
         public Shape getSeriesShape(int series) {
-            return shape;
+            return dotShape;
         }
 
 

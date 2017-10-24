@@ -39,7 +39,7 @@ public class AreaCharts {
             });
         });
 
-        Chart.create().htmlMode();
+        //Chart.create().htmlMode();
 
         Chart.create().withAreaPlot(frame, true, chart -> {
             chart.plot().axes().domain().label().withText("X-Value");
@@ -47,7 +47,7 @@ public class AreaCharts {
             chart.title().withText("Stacked Area Chart");
             chart.subtitle().withText("Cumulative Sum of Random Normal Data");
             chart.legend().on();
-            chart.writerPng(new File("../morpheus-docs/docs/images/charts/chart-area-1.png"), 845, 450, true);
+            //chart.writerPng(new File("../morpheus-docs/docs/images/charts/chart-area-1.png"), 845, 450, true);
             chart.show();
         });
 
@@ -57,7 +57,7 @@ public class AreaCharts {
             chart.title().withText("Overlapping Area Chart");
             chart.subtitle().withText("Cumulative Sum of Random Normal Data");
             chart.legend().on();
-            chart.writerPng(new File("../morpheus-docs/docs/images/charts/chart-area-2.png"), 845, 450, true);
+            //chart.writerPng(new File("../morpheus-docs/docs/images/charts/chart-area-2.png"), 845, 450, true);
             chart.show();
         });
 
