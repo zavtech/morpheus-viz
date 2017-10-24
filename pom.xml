@@ -60,7 +60,7 @@
     <dependency>
       <groupId>com.zavtech</groupId>
       <artifactId>morpheus-core</artifactId>
-      <version>0.9.14</version>
+      <version>0.9.15</version>
     </dependency>
 
     <dependency>
