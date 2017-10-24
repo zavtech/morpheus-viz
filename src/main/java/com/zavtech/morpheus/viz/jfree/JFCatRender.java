@@ -16,6 +16,7 @@
 package com.zavtech.morpheus.viz.jfree;
 
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.AreaRenderer;
@@ -51,7 +52,13 @@ class JFCatRender implements XyRender {
 
     @Override()
     public void withDots() {
-        this.plot.underlying().setRenderer(index, new LineAndShapeRenderer(false, false));
+        this.withDots(4);
+    }
+
+
+    @Override
+    public void withDots(int diameter) {
+        this.plot.underlying().setRenderer(index, new MorpheusDotRenderer(index, diameter));
     }
 
 
@@ -83,7 +90,6 @@ class JFCatRender implements XyRender {
     public void withSpline(boolean shapes, boolean dashed) {
         throw new UnsupportedOperationException("Not supported for category plots");
     }
-
 
 
     /**
@@ -158,6 +164,53 @@ class JFCatRender implements XyRender {
                 ex.printStackTrace();
                 return super.getSeriesPaint(series);
             }
+        }
+    }
+
+    /**
+     * A Morpheus render for rendering dots on a category plot
+     */
+    private class MorpheusDotRenderer extends LineAndShapeRenderer {
+
+
+        private int datasetIndex;
+        private Shape dotShape;
+
+        /**
+         * Constructor
+         * @param datasetIndex  the dataset index
+         * @param diameter      the diameter in pixels
+         */
+        MorpheusDotRenderer(int datasetIndex, int diameter) {
+            this.datasetIndex = datasetIndex;
+            this.dotShape = new Ellipse2D.Double(-4/2, -4/2, diameter, diameter);
+            this.setBaseShape(dotShape);
+            this.setBaseLinesVisible(false);
+            this.setBaseShapesVisible(true);
+        }
+
+
+        @Override
+        public Paint getSeriesPaint(int series) {
+            try {
+                final CategoryPlot categoryPlot = getPlot();
+                final CategoryDataset dataset = categoryPlot.getDataset(datasetIndex);
+                if (dataset != null) {
+                    final Comparable seriesKey = dataset.getRowKey(series);
+                    final Color color = plot.getSeriesColor(seriesKey);
+                    return color != null ? color : plot.getColorModel().getColor(seriesKey);
+                }
+                return super.getSeriesPaint(series);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                return super.getSeriesPaint(series);
+            }
+        }
+
+
+        @Override
+        public Shape getSeriesShape(int series) {
+            return super.getSeriesShape(series);
         }
     }
 

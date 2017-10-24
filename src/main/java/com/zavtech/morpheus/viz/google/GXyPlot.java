@@ -187,7 +187,7 @@ class GXyPlot<X extends Comparable> extends XyPlotBase<X> {
                     series.newAttribute("color", ColorModel.toHexString(color));
                     if (render.hasShapesOrPoints()) {
                         series.newAttribute("pointsVisible", render.isSeriesPointsVisible(seriesKey));
-                        series.newAttribute("pointSize", render.isScatter() ? 2 : 4);
+                        series.newAttribute("pointSize", render.getPointSize());
                     }
                     if (render.isLines()) {
                         series.newAttribute("lineWidth", lineWidth.orElse(1f));

@@ -30,6 +30,12 @@ public interface XyRender {
     void withDots();
 
     /**
+     * Configures the renderer to draw dots in a scatter plot
+     * @param diameter  the diameter of dots measured in pixels
+     */
+    void withDots(int diameter);
+
+    /**
      * Configures the renderer to draw shapes in a scatter plot
      */
     void withShapes();

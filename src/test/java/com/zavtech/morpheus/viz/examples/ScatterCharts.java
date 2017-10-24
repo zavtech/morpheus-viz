@@ -118,13 +118,13 @@ public class ScatterCharts {
 
         Chart.create().withScatterPlot(frame1, false, "X", chart -> {
             chart.plot().<String>data().add(frame2, "X");
-            chart.plot().render(1).withDots();
+            chart.plot().render(1).withDots(7);
             chart.plot().axes().domain().label().withText("X-Value");
             chart.plot().axes().range(0).label().withText("Y-Value");
             chart.title().withText("Scatter Chart");
             chart.subtitle().withText("Multiple DataFrames, Multiple Series");
             chart.legend().on();
-            chart.writerPng(new File("../morpheus-docs/docs/images/charts/chart-scatter-3.png"), 845, 450, true);
+            //chart.writerPng(new File("../morpheus-docs/docs/images/charts/chart-scatter-3.png"), 845, 450, true);
             chart.show();
         });
 
