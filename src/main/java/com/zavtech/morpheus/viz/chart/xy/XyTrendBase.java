@@ -85,7 +85,7 @@ public abstract class XyTrendBase implements XyTrend {
      */
     public <X extends Comparable> DataFrame<Double,Comparable> createTrendData(XyDataset<X,Comparable> source, Comparable seriesKey, Comparable trendKey) {
         final DataFrame<Integer,Object> seriesFrame = createSeriesData(source, seriesKey);
-        final Optional<Bounds<Number>> regressorRange = seriesFrame.colAt("Regressor").bounds();
+        final Optional<Bounds<Number>> regressorRange = seriesFrame.col("Regressor").bounds();
         if (!regressorRange.isPresent()) {
             return DataFrame.empty();
         } else {
