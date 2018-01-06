@@ -91,7 +91,7 @@ public class Histograms {
             columns.add("A", Array.randn(recordCount));
         });
 
-        Optional<DataFrame<Double,String>> pdfNormal = frame.colAt("A").<Double>bounds().map(bounds -> {
+        Optional<DataFrame<Double,String>> pdfNormal = frame.col("A").<Double>bounds().map(bounds -> {
             final double startX = Math.max(Math.abs(bounds.lower()), Math.abs(bounds.upper()));
             final DataFrame<Double,String> pdf = normal("PDF(N)", -startX, startX, 1000, 0d, 1d);
             final double maxCount = frame.cols().select("A").cols().hist(binCount).stats().max();
